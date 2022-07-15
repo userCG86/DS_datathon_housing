@@ -25,16 +25,8 @@ if uploaded_file is not None and st.session_state.text_input != "":
         )
     
     st.write('### Dataframe uploaded successfully!')
-    results = pd.DataFrame([
-                [1, 'a'],
-                [2, 'b'],
-                [3, 'a'],
-                [4, 'a'],
-                [5, 'a'],
-            ], 
-        columns=['id','real']
-    )
     
+    results = pd.read_csv('results.csv')
     participant_results = (
     results
         .assign(
@@ -65,7 +57,7 @@ if uploaded_file is not None and st.session_state.text_input != "":
         st.write('### Leaderboard:')
         st.dataframe(
             leaderboard
-            .sort_values(by='accuracy')
+            .sort_values(by='accuracy', ascending=False)
         )
         leaderboard.to_csv('leaderboard.csv')
     except: 
