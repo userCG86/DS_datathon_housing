@@ -27,6 +27,8 @@ if uploaded_file is not None and st.session_state.text_input != "":
     st.write('### Dataframe uploaded successfully!')
     
     results = pd.read_csv('results.csv')
+    st.dataframe(results)
+    st.dataframe(test)
     participant_results = (
     results
         .assign(
