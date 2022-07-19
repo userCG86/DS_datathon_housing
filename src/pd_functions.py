@@ -48,6 +48,8 @@ def plot_submissions(participant_name):
         )
     if len(participant_submissions) > 1:
         st.line_chart(participant_submissions)
+    else: 
+        st.write('Congratulations on your first submission!')
 
 
 def update_submissions(participant_results: pd.DataFrame):
