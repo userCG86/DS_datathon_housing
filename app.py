@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
-from students import students
+from files_to_update.students import students
 from src.pd_functions import *
 
 # path to results
-RESULTS_PATH = 'data/results.csv'
+RESULTS_PATH = 'data/results_housing_class.csv'
 
 # introduce participant name
 text_input_container = st.empty()
@@ -32,15 +32,18 @@ if uploaded_file is not None and st.session_state.text_input != "":
         participant_results = get_accuracy(RESULTS_PATH, test)
 
         # print participant results
-        st.write('Participant results:')
+        st.title('Participant results')
         st.dataframe(participant_results)
 
-        # update and show leaderboard
+        # update all submissions
         try: 
-            update_and_show_leaderboard(participant_results)
+            update_submissions(participant_results)
+            plot_submissions(st.session_state.text_input)
         except: 
-            participant_results.to_csv('leaderboard.csv', index=False)
-            st.write('First submission!')
+            participant_results.to_pickle('files_to_update/submissions.pkl')
+        
+        # show leaderboard
+        show_leaderboard()
         
     except: 
         st.write('The file has a wrong format, please, review it and load it again.')

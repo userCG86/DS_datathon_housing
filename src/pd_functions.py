@@ -13,6 +13,7 @@ def get_ready_test(uploaded_file):
             )
         )
 
+
 def get_accuracy(RESULTS_PATH: str, test: pd.DataFrame):
 
     results = pd.read_csv(RESULTS_PATH)
@@ -29,24 +30,47 @@ def get_accuracy(RESULTS_PATH: str, test: pd.DataFrame):
         .agg(result = ('check','sum'))
         .assign(
             accuracy = lambda df_: df_['check'] / results.shape[0], 
-            participant = st.session_state.text_input
+            participant = st.session_state.text_input, 
+            submission_time = pd.Timestamp.now()
             )
-        .filter(['participant','accuracy'])
+        .filter(['participant','accuracy','submission_time'])
         )
 
-def update_and_show_leaderboard(participant_results: pd.DataFrame): 
 
-    leaderboard = (
+def plot_submissions(participant_name): 
+    
+    participant_submissions = (
+        pd.read_pickle('files_to_update/submissions.pkl')
+            .query('participant == @participant_name')
+            .filter(['submission_time','accuracy'])
+            .set_index('submission_time')
+            .copy()
+        )
+    if len(participant_submissions) > 1:
+        st.line_chart(participant_submissions)
+
+
+def update_submissions(participant_results: pd.DataFrame):
+
+    (
         pd.concat([
-            pd.read_csv('data/leaderboard.csv'), 
+            pd.read_pickle('files_to_update/submissions.pkl'), 
             participant_results
-        ], ignore_index=True
-        )
+        ])
+        .to_pickle('files_to_update/submissions.pkl')
+    )
+
+
+def show_leaderboard(): 
+
+    st.title('LEADERBOARD')
+
+    st.dataframe(
+    pd.read_pickle('files_to_update/submissions.pkl')
+        .assign(attempts = lambda df_: df_.groupby('participant')['participant'].transform('count'))
         .sort_values(['participant','accuracy'], ascending=False)
         .drop_duplicates(['participant'], keep='first')
-        )
-    
-    st.write('Leaderboard:')
-    st.dataframe(leaderboard)
-
-    leaderboard.to_csv('data/leaderboard.csv', index=False)
+        .assign(position = lambda df_: range(1, len(df_)+1)) 
+        .set_index('position')  
+        .filter(['participant','accuracy','attempts'])
+    )
