@@ -42,9 +42,6 @@ if uploaded_file is not None and st.session_state.text_input != "":
         except: 
             participant_results.to_pickle('files_to_update/submissions.pkl')
         
-        # show leaderboard
-        # show_leaderboard()
-        
     except: 
         st.error('The file has a wrong format, please, review it and load it again.')
 
