@@ -70,7 +70,7 @@ def show_leaderboard():
     st.dataframe(
     pd.read_pickle('files_to_update/submissions.pkl')
         .assign(attempts = lambda df_: df_.groupby('participant')['participant'].transform('count'))
-        .sort_values(['participant','accuracy'], ascending=False)
+        .sort_values(['accuracy'], ascending=False)
         .drop_duplicates(['participant'], keep='first')
         .assign(position = lambda df_: range(1, len(df_)+1)) 
         .set_index('position')  
