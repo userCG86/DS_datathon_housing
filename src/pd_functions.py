@@ -25,7 +25,7 @@ def get_accuracy(RESULTS_PATH: str, test: pd.DataFrame):
             id = lambda df_: df_['id'].astype('int32'),
             real = lambda df_: df_['real'].astype('object')
         )
-        .merge(test, how='inner')
+        .merge(test, how='inner', on='id')
         .assign(check = lambda df_: df_['real'] == df_['preds'])
         .agg(result = ('check','sum'))
         .assign(
