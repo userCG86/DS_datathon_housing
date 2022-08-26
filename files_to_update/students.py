@@ -13,5 +13,6 @@ students = [
     "Sebastian",
     "Sherwan",
     "Simon",
-    "Tobias"
+    "Tobias",
+    "wbs_bot"
 ]
