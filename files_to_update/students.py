@@ -1,10 +1,17 @@
 students = [
-    'monika',
-    'ben',
-    'hana',
-    'vinita',
-    'ali',
-    'guillem',
-    'sabine',
-    'joan'
+    "Aslam",
+    "Daniel_A",
+    "Daniel_D",
+    "Huy",
+    "Icaro",
+    "Ilkay",
+    "Kayla",
+    "Komal",
+    "Nabil",
+    "Orjada",
+    "Peter",
+    "Sebastian",
+    "Sherwan",
+    "Simon",
+    "Tobias"
 ]
