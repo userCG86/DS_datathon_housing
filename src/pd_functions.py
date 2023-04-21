@@ -66,8 +66,10 @@ def get_accuracy(RESULTS_PATH: str, test: pd.DataFrame):
                 participant=st.session_state.text_input,
                 submission_time=pd.Timestamp.now()
             )
+            .astype({'accuracy': 'float64'})
             .filter(['participant', 'accuracy', 'submission_time'])
     )
+
 
 
 def plot_submissions(participant_name):
@@ -112,29 +114,28 @@ def show_leaderboard():
     else:
         st.write("There is no submission.")
 
+
 def get_submissions_dataframe():
     try:
         return pd.read_pickle('files_to_update/submissions.pkl')
     except FileNotFoundError:
-        return pd.DataFrame()
+        return pd.DataFrame(columns=['participant', 'accuracy', 'submission_time'])
 
 
 def generate_leaderboard_dataframe(submissions_df):
     best_results_per_participant = (
         submissions_df
-            .groupby("participant")
-            .apply(lambda df_: df_.loc[df_["accuracy"].idxmax()])
-            .reset_index(drop=True)
-    )
-
-    return (
-        best_results_per_participant
-        .assign(attempts=lambda df_: submissions_df.groupby('participant')['participant'].count().values)
-        .sort_values(['accuracy'], ascending=False)
+        .assign(
+            attempts=lambda df_: df_.groupby('participant')['participant'].transform('count')
+        )
+        .sort_values(['accuracy','submission_time'], ascending=[False, True])
+        .drop_duplicates(subset=['participant'], keep='first')
         .assign(position=lambda df_: range(1, len(df_) + 1))
         .set_index('position')
         .filter(['participant', 'accuracy', 'attempts'])
-    )
+        )
+
+    return best_results_per_participant
 
 
 
