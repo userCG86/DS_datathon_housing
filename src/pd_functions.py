@@ -97,13 +97,9 @@ def update_submissions(participant_results: pd.DataFrame):
     Args:
         participant_results (pd.DataFrame): DataFrame containing the participant's results.
     """
-    (
-        pd.concat([
-            pd.read_pickle('files_to_update/submissions.pkl'),
-            participant_results
-        ])
-        .to_pickle('files_to_update/submissions.pkl')
-    )
+    submissions_df = get_submissions_dataframe()
+    updated_submissions_df = pd.concat([submissions_df, participant_results])
+    updated_submissions_df.to_pickle('files_to_update/submissions.pkl')
 
 
 def show_leaderboard(): 
@@ -118,20 +114,21 @@ def show_leaderboard():
 
 def get_submissions_dataframe():
     try:
-        return pd.read_pickle('static/submissions.pkl')
+        return pd.read_pickle('files_to_update/submissions.pkl')
     except FileNotFoundError:
         return pd.DataFrame()
 
+
 def generate_leaderboard_dataframe(submissions_df):
-    return (
-        submissions_df
-        .assign(attempts=lambda df_: df_.groupby('participant')['participant'].transform('count'))
-        .sort_values(['accuracy'], ascending=False)
-        .drop_duplicates(['participant'], keep='first')
-        .assign(position=lambda df_: range(1, len(df_)+1)) 
-        .set_index('position')  
-        .filter(['participant','accuracy','attempts'])
-    )
+    submissions_df['attempts'] = submissions_df.groupby('participant')['participant'].transform('count')
+    sorted_df = submissions_df.sort_values(['accuracy'], ascending=False)
+    deduplicated_df = sorted_df.drop_duplicates(['participant'], keep='first')
+    deduplicated_df['position'] = range(1, len(deduplicated_df) + 1)
+    deduplicated_df.set_index('position', inplace=True)
+    final_df = deduplicated_df[['participant', 'accuracy', 'attempts']]
+    
+    return final_df
+
 
 def update_submissions(participant_results: pd.DataFrame):
     submissions_df = get_submissions_dataframe()
