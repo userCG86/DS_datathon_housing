@@ -121,11 +121,11 @@ def get_submissions_dataframe():
 
 def generate_leaderboard_dataframe(submissions_df):
     submissions_df['attempts'] = submissions_df.groupby('participant')['participant'].transform('count')
-    sorted_df = submissions_df.sort_values(['accuracy'], ascending=False)
-    deduplicated_df = sorted_df.drop_duplicates(['participant'], keep='first')
-    deduplicated_df['position'] = range(1, len(deduplicated_df) + 1)
-    deduplicated_df.set_index('position', inplace=True)
-    final_df = deduplicated_df[['participant', 'accuracy', 'attempts']]
+    best_submissions_df = submissions_df.loc[submissions_df.groupby('participant')['accuracy'].idxmax()]
+    sorted_df = best_submissions_df.sort_values(['accuracy'], ascending=False)
+    sorted_df['position'] = range(1, len(sorted_df) + 1)
+    sorted_df.set_index('position', inplace=True)
+    final_df = sorted_df[['participant', 'accuracy', 'attempts']]
     
     return final_df
 
@@ -133,4 +133,4 @@ def generate_leaderboard_dataframe(submissions_df):
 def update_submissions(participant_results: pd.DataFrame):
     submissions_df = get_submissions_dataframe()
     updated_submissions_df = pd.concat([submissions_df, participant_results])
-    updated_submissions_df.to_pickle('static/submissions.pkl')
+    updated_submissions_df.to_pickle('files_to_update/submissions.pkl')
