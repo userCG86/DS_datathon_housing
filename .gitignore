@@ -7,6 +7,8 @@ __pycache__/
 
 # Jupyter Notebook
 *.ipynb_checkpoints
+# ignore notebooks
+*.ipynb
 
 
 # Temp files
