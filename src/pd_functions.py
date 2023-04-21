@@ -120,14 +120,22 @@ def get_submissions_dataframe():
 
 
 def generate_leaderboard_dataframe(submissions_df):
-    submissions_df['attempts'] = submissions_df.groupby('participant')['participant'].transform('count')
-    best_submissions_df = submissions_df.loc[submissions_df.groupby('participant')['accuracy'].idxmax()]
-    sorted_df = best_submissions_df.sort_values(['accuracy'], ascending=False)
-    sorted_df['position'] = range(1, len(sorted_df) + 1)
-    sorted_df.set_index('position', inplace=True)
-    final_df = sorted_df[['participant', 'accuracy', 'attempts']]
-    
-    return final_df
+    best_results_per_participant = (
+        submissions_df
+            .groupby("participant")
+            .apply(lambda df_: df_.loc[df_["accuracy"].idxmax()])
+            .reset_index(drop=True)
+    )
+
+    return (
+        best_results_per_participant
+        .assign(attempts=lambda df_: submissions_df.groupby('participant')['participant'].count().values)
+        .sort_values(['accuracy'], ascending=False)
+        .assign(position=lambda df_: range(1, len(df_) + 1))
+        .set_index('position')
+        .filter(['participant', 'accuracy', 'attempts'])
+    )
+
 
 
 def update_submissions(participant_results: pd.DataFrame):
