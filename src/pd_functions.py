@@ -138,7 +138,6 @@ def generate_leaderboard_dataframe(submissions_df):
     return best_results_per_participant
 
 
-
 def update_submissions(participant_results: pd.DataFrame):
     submissions_df = get_submissions_dataframe()
     updated_submissions_df = pd.concat([submissions_df, participant_results])
