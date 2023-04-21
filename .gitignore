@@ -1,0 +1,26 @@
+# .gitignore
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter Notebook
+*.ipynb_checkpoints
+
+
+# Temp files
+*.log
+*.tmp
+
+# Config files
+*.ini
+*.yaml
+*.json
+
+# Cache files
+.cache
+.cache/*
+
+# Ignore students.py
+files_to_update/students.py

@@ -1,58 +1,60 @@
 import streamlit as st
 import pandas as pd
-# from files_to_update.students import students
 from src.pd_functions import *
 
-# path to results
+# Constants
 RESULTS_PATH = 'data/results_housing_class.csv'
 
-# introduce participant name
-text_input_container = st.empty()
-text_input_container.text_input(
-    "Introduce participant name: ",
-    key="text_input"
-)
+def main():
+    participant_name = get_participant_name()
 
+    if participant_name:
+        uploaded_file = st.file_uploader("Choose a file")
 
-# if st.session_state.text_input != "":
-#     if st.session_state.text_input in students:
-#         text_input_container.empty()
-#         st.info('Participant name ' + st.session_state.text_input)
-#     else:
-#         st.error("Please, introduce the your correct student name.")
+        if uploaded_file:
+            process_uploaded_file(uploaded_file, participant_name)
+        else:
+            st.warning('Please upload a file.')
+    else:
+        st.warning('Please enter a participant name.')
 
-if st.session_state.text_input != "":
+    display_leaderboard()
 
-    # upload results file
-    uploaded_file = st.file_uploader("Choose a file")
+def get_participant_name():
+    text_input_container = st.empty()
+    participant_name = text_input_container.text_input(
+        "Introduce participant name: ",
+        key="text_input"
+    )
+    return participant_name
 
-    if uploaded_file is not None and st.session_state.text_input != "":
+def process_uploaded_file(uploaded_file, participant_name):
+    try:
+        test = get_ready_test(RESULTS_PATH, uploaded_file)
+        participant_results = get_accuracy(RESULTS_PATH, test)
 
-        try:
-            # read results file
-            test = get_ready_test(RESULTS_PATH, uploaded_file)
+        st.success('Dataframe uploaded successfully!')
+        display_participant_results(participant_results)
+        update_and_plot_submissions(participant_results, participant_name)
+    except:
+        st.error('The file has a wrong format, please, review it and load it again.')
 
-            # get participant accuracy and prepare data for leaderboard
-            participant_results = get_accuracy(RESULTS_PATH, test)
+def display_participant_results(participant_results):
+    st.title('Participant results')
+    st.dataframe(participant_results)
 
-            st.success('Dataframe uploaded successfully!')
-            # print participant results
-            st.title('Participant results')
-            st.dataframe(participant_results)
+def update_and_plot_submissions(participant_results, participant_name):
+    try:
+        update_submissions(participant_results)
+        plot_submissions(participant_name)
+    except:
+        participant_results.to_pickle('files_to_update/submissions.pkl')
 
-            # update all submissions
-            try:
-                update_submissions(participant_results)
-                plot_submissions(st.session_state.text_input)
-            except:
-                participant_results.to_pickle(
-                    'files_to_update/submissions.pkl')
+def display_leaderboard():
+    try:
+        show_leaderboard()
+    except:
+        st.write("There is no submission.")
 
-        except:
-            st.error(
-                'The file has a wrong format, please, review it and load it again.')
-
-try:
-    show_leaderboard()
-except:
-    st.write("There is no submission.")
+if __name__ == "__main__":
+    main()
