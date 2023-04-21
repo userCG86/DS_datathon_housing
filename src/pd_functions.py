@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+import io
 
 def get_ready_test(RESULTS_PATH: str, uploaded_file):
     """
