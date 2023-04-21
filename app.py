@@ -36,15 +36,20 @@ def get_participant_name():
     return participant_name
 
 def process_uploaded_file(uploaded_file, participant_name):
-    try:
-        test = get_ready_test(RESULTS_PATH, uploaded_file)
-        participant_results = get_accuracy(RESULTS_PATH, test)
+    if validate_csv_file(uploaded_file):
+        try:
+            uploaded_file.seek(0)  # Reset file pointer to the beginning
+            test = get_ready_test(RESULTS_PATH, uploaded_file)
+            participant_results = get_accuracy(RESULTS_PATH, test)
 
-        st.success('Dataframe uploaded successfully!')
-        display_participant_results(participant_results)
-        update_and_plot_submissions(participant_results, participant_name)
-    except Exception as e:
-        st.error(f'The file has a wrong format, please, review it and load it again. Exception: {e}')
+            st.success('Dataframe uploaded successfully!')
+            display_participant_results(participant_results)
+            update_and_plot_submissions(participant_results, participant_name)
+        except Exception as e:
+            st.error(f'The file could not be processed. Error: {e}')
+    else:
+        st.error('The file has a wrong format, please, review it and ensure it contains the required columns.')
+
 
 
 def display_participant_results(participant_results):
