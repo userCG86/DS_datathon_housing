@@ -21,6 +21,3 @@ __pycache__/
 # Cache files
 .cache
 .cache/*
-
-# Ignore students.py
-files_to_update/students.py
