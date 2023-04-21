@@ -104,18 +104,34 @@ def update_submissions(participant_results: pd.DataFrame):
     )
 
 
-def show_leaderboard():
-    """
-    Display the leaderboard with participant rankings.
-    """
+def show_leaderboard(): 
     st.title('LEADERBOARD')
+    
+    submissions_df = get_submissions_dataframe()
+    if not submissions_df.empty:
+        leaderboard_df = generate_leaderboard_dataframe(submissions_df)
+        st.dataframe(leaderboard_df)
+    else:
+        st.write("There is no submission.")
 
-    st.dataframe(
-        pd.read_pickle('files_to_update/submissions.pkl')
-            .assign(attempts=lambda df_: df_.groupby('participant')['participant'].transform('count'))
-            .sort_values(['accuracy'], ascending=False)
-            .drop_duplicates(['participant'], keep='first')
-            .assign(position=lambda df_: range(1, len(df_) + 1))
-            .set_index('position')
-            .filter(['participant', 'accuracy', 'attempts'])
-    ) 
+def get_submissions_dataframe():
+    try:
+        return pd.read_pickle('static/submissions.pkl')
+    except FileNotFoundError:
+        return pd.DataFrame()
+
+def generate_leaderboard_dataframe(submissions_df):
+    return (
+        submissions_df
+        .assign(attempts=lambda df_: df_.groupby('participant')['participant'].transform('count'))
+        .sort_values(['accuracy'], ascending=False)
+        .drop_duplicates(['participant'], keep='first')
+        .assign(position=lambda df_: range(1, len(df_)+1)) 
+        .set_index('position')  
+        .filter(['participant','accuracy','attempts'])
+    )
+
+def update_submissions(participant_results: pd.DataFrame):
+    submissions_df = get_submissions_dataframe()
+    updated_submissions_df = pd.concat([submissions_df, participant_results])
+    updated_submissions_df.to_pickle('static/submissions.pkl')

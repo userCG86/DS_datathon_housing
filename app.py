@@ -1,18 +1,25 @@
 import streamlit as st
 import pandas as pd
 from src.pd_functions import *
+from src.utils import validate_csv_file
 
 # Constants
 RESULTS_PATH = 'data/results_housing_class.csv'
 
 def main():
+    st.title('Housing Classification App')
+    st.write('Welcome to the housing classification app. Please enter your name and upload your results file to check your accuracy and see the leaderboard.')
+
     participant_name = get_participant_name()
 
     if participant_name:
-        uploaded_file = st.file_uploader("Choose a file")
+        uploaded_file = st.file_uploader("Choose a CSV file", type=['csv'])
 
         if uploaded_file:
-            process_uploaded_file(uploaded_file, participant_name)
+            if validate_csv_file(uploaded_file):
+                process_uploaded_file(uploaded_file, participant_name)
+            else:
+                st.error('The uploaded file is not a valid CSV file. Please upload a valid CSV file.')
         else:
             st.warning('Please upload a file.')
     else:
