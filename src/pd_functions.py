@@ -14,8 +14,9 @@ def get_ready_test(RESULTS_PATH: str, uploaded_file):
     """
     results = pd.read_csv(RESULTS_PATH)
     results.columns = ['id', 'real']
-    
-    test = pd.read_csv(uploaded_file)
+
+    test = pd.read_csv(io.StringIO(uploaded_file.read().decode('utf-8')))
+
     if test.columns.to_list() != ['Id', 'Expensive']:
         st.error('Column names must match "Id" and "Expensive" - case sensitive!')
         return 0
