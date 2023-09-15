@@ -23,3 +23,7 @@ __pycache__/
 # Cache files
 .cache
 .cache/*
+
+# Virtualenvs
+.venv
+venv
