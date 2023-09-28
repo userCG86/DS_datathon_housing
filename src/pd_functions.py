@@ -60,7 +60,7 @@ def get_accuracy(RESULTS_PATH: str, test: pd.DataFrame):
             )
             .merge(test, how='left', on='id')
             .assign(check=lambda df_: df_['real'] == df_['preds'])
-            .agg(result=('check', 'sum'))
+            .agg(acc_result=('check', 'sum')) #The line that I changed 
             .assign(
                 accuracy=lambda df_: df_['check'] / results.shape[0],
                 participant=st.session_state.text_input,
@@ -69,7 +69,6 @@ def get_accuracy(RESULTS_PATH: str, test: pd.DataFrame):
             .astype({'accuracy': 'float64'})
             .filter(['participant', 'accuracy', 'submission_time'])
     )
-
 
 
 def plot_submissions(participant_name):
