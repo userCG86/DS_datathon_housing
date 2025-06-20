@@ -16,10 +16,7 @@ def main():
         uploaded_file = st.file_uploader("Choose a CSV file", type=['csv'])
 
         if uploaded_file:
-            if validate_csv_file(uploaded_file):
-                process_uploaded_file(uploaded_file, participant_name)
-            else:
-                st.error('The uploaded file is not a valid CSV file. Please upload a valid CSV file.')
+            process_uploaded_file(uploaded_file, participant_name)
         else:
             st.warning('Please upload a file.')
     else:
@@ -40,11 +37,12 @@ def process_uploaded_file(uploaded_file, participant_name):
         try:
             uploaded_file.seek(0)  # Reset file pointer to the beginning
             test = get_ready_test(RESULTS_PATH, uploaded_file)
-            participant_results = get_accuracy(RESULTS_PATH, test)
-
-            st.success('Dataframe uploaded successfully!')
-            display_participant_results(participant_results)
-            update_and_plot_submissions(participant_results, participant_name)
+            if isinstance(test, pd.DataFrame):
+                participant_results = get_accuracy(RESULTS_PATH, test)
+                st.success('Dataframe uploaded successfully!')
+                display_participant_results(participant_results)
+                update_and_plot_submissions(participant_results, participant_name)
+                
         except Exception as e:
             st.error(f'The file could not be processed. Error: {e}')
     else:
