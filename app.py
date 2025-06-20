@@ -4,7 +4,7 @@ from src.pd_functions import *
 from src.utils import validate_csv_file
 
 # Constants
-RESULTS_PATH = 'data/results_housing_class.csv'
+RESULTS_PATH = 'data/true_y.csv'
 
 def main():
     st.title('Housing Classification App')
