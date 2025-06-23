@@ -26,11 +26,14 @@ def main():
 
 def get_participant_name():
     text_input_container = st.empty()
-    participant_name = text_input_container.text_input(
-        "Enter your participant name: ",
-        key="text_input"
-    )
-    return participant_name
+    text_input_container.text_input("Enter your participant name: ", key="text_input")
+
+    if st.session_state.text_input != "":
+        text_input_container.empty()
+        st.info(f'Participant name {st.session_state.text_input}')
+        return st.session_state.text_input
+
+    return None
 
 def process_uploaded_file(uploaded_file, participant_name):
     if validate_csv_file(uploaded_file):
