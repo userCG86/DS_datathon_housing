@@ -27,3 +27,9 @@ __pycache__/
 # Virtualenvs
 .venv
 venv
+
+# DS_Store
+.DS_Store
+
+# submission file
+files_to_update/submissions.pkl

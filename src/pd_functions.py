@@ -32,10 +32,7 @@ def get_ready_test(RESULTS_PATH: str, uploaded_file):
         return 0
 
     test.columns = ['id', 'preds']
-    return test.assign(
-        id=lambda df_: df_['id'].astype('int32'),
-        preds=lambda df_: df_['preds'].astype('object'),
-    )
+    return test.astype('int32')
 
 
 def get_accuracy(RESULTS_PATH: str, test: pd.DataFrame):
@@ -51,24 +48,22 @@ def get_accuracy(RESULTS_PATH: str, test: pd.DataFrame):
     """
     results = pd.read_csv(RESULTS_PATH)
     results.columns = ['id', 'real']
-
-    return (
+    results = results.astype('int32')
+    accuracy_count = (
         results
-            .assign(
-                id=lambda df_: df_['id'].astype('int32'),
-                real=lambda df_: df_['real'].astype('object')
-            )
-            .merge(test, how='left', on='id')
-            .assign(check=lambda df_: df_['real'] == df_['preds'])
-            .agg(acc_result=('check', 'sum')) #The line that I changed 
-            .assign(
-                accuracy=lambda df_: df_['check'] / results.shape[0],
-                participant=st.session_state.text_input,
-                submission_time=pd.Timestamp.now()
-            )
-            .astype({'accuracy': 'float64'})
-            .filter(['participant', 'accuracy', 'submission_time'])
+        .merge(test, how='left', on='id')
+        .assign(check=lambda df_: df_['real'] == df_['preds'])
+        ["check"]
+        .sum() 
     )
+    accuracy_value = accuracy_count / results.shape[0]
+    
+    return pd.DataFrame(
+        [[accuracy_value, st.session_state.text_input, pd.Timestamp.now()]],
+        columns = ["accuracy", "participant", "submission_time"],
+        index = ["result"]
+    )
+    
 
 
 def plot_submissions(participant_name):
